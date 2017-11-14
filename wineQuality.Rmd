@@ -1,0 +1,223 @@
+Wine Quality 
+========================================================
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using
+# in your analysis in this code chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk.
+# This prevents the code from displaying in the knitted HTML output.
+# You should set echo=FALSE for all code chunks in your file.
+
+library(ggplot2)
+library(GGally)
+library(scales)
+library(memisc)
+```
+
+```{r echo=TRUE, Load_the_Data}
+# Load the Data
+winedata=read.csv('wineQualityReds.csv')
+# winedata=read.csv('wineQualityWhites.csv')
+```
+
+```{r}
+singal_var_his<-function(x,binwidth){
+  qplot(x=x,binwidth=binwidth)
+}
+
+```
+
+# Univariate Plots Section
+```{r echo=TRUE, Univariate_Plots}
+winedata$quality_factor=factor(winedata$quality)
+winedata$acidity=with(data=winedata,fixed.acidity+volatile.acidity+citric.acid)
+
+singal_var_his(winedata$fixed.acidity,0.2)
+
+#不易挥发性酸
+singal_var_his(winedata$fixed.acidity,0.2)
+#易挥发性酸
+singal_var_his(winedata$volatile.acidity,0.02)
+#柠檬酸
+singal_var_his(winedata$citric.acid,0.02)
+#剩余糖分
+singal_var_his(winedata$residual.sugar,0.2)
+#氯化物
+singal_var_his(winedata$chlorides,0.02)+
+  scale_x_log10()
+#单体硫
+singal_var_his(winedata$free.sulfur.dioxide,1)
+#总硫量
+singal_var_his(winedata$total.sulfur.dioxide,5)+
+  xlim(0,165)
+#table(winedata$total.sulfur.dioxide)
+#密度
+singal_var_his(winedata$density,0.0005)
+#pH值
+singal_var_his(winedata$pH,0.05)
+#硫酸盐
+singal_var_his(winedata$sulphates,0.02)+
+  xlim(0.3,1.5)
+#table(winedata$sulphates)
+#酒精度
+singal_var_his(winedata$alcohol,0.2)
+#table(winedata$alcohol)
+#酸总量
+singal_var_his(winedata$acidity,0.5)
+```
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+### 数据集中包含了红酒的化学成分以及这些成分的具体含量，还包括了红酒品质的评价字段
+
+### What is/are the main feature(s) of interest in your dataset?
+### 我感兴趣的变量有citric.acid(柠檬酸)、free.sulfur.dioxide(游离二氧化硫)、total.sulfur.dioxide(总硫量)、alcohol(酒精度),从这些变量的的直方图可以看出，这些这些变量的分布是分布是不对称的
+
+### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+### 密度变量与就的品质也有一定关系
+
+### Did you create any new variables from existing variables in the dataset?
+### 1.quality变量经过factor函数衍生出quality_factor变量 2.把所有酸加和的acidity字段
+
+### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+### 没有
+
+```{r}
+quality_boxplot<-function(x,y,method='boxplot'){
+  if(method=='boxplot'){
+    qplot(x,y,geom=method)
+  }
+}
+```
+
+# Bivariate Plots Section
+###全量矩阵图
+```{r echo=TRUE, Bivariate_Plots}
+p_<-GGally::print_if_interactive
+wine_plot<-wrap(ggpairs,shape=I('.'),outlier.shape=I('.'))
+wine_plot1<-wine_plot(winedata,mapping = NULL)
+p_(wine_plot1)
+```
+###所有变量与quality_factor之间的boxplot
+```{r}
+quality_boxplot(winedata$quality_factor,winedata$fixed.acidity)
+quality_boxplot(winedata$quality_factor,winedata$volatile.acidity)
+quality_boxplot(winedata$quality_factor,winedata$citric.acid)
+quality_boxplot(winedata$quality_factor,winedata$residual.sugar)
+quality_boxplot(winedata$quality_factor,winedata$chlorides)
+quality_boxplot(winedata$quality_factor,winedata$free.sulfur.dioxide)
+quality_boxplot(winedata$quality_factor,winedata$total.sulfur.dioxide)
+quality_boxplot(winedata$quality_factor,winedata$density)
+quality_boxplot(winedata$quality_factor,winedata$pH)
+quality_boxplot(winedata$quality_factor,winedata$sulphates)
+quality_boxplot(winedata$quality_factor,winedata$alcohol)
+```
+
+# Bivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+### 通过观察每个变量与品质变量之间的boxplot关系发现，酒的品质越高，volatile.acidity（挥发性酸）均值越低，citric acid(柠檬酸)均值越来越高，density(密度)均值也是基本上呈下降趋势，pH值均值也呈略微下降趋势，sulphates(硫酸盐)均值呈上升趋势，
+
+### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
+### 酸的含量越高，pH值越低,这两个变量为耦合变量;变量total.sulfur.dioxide和free.sulfur.dioxide之间呈正相关性
+
+### What was the strongest relationship you found?
+### 酒的品质与酒精度的相关系数最大;total.sulfur.dioxide free.sulfur.dioxide之间呈正相关性
+
+
+
+# Multivariate Plots Section
+
+```{r echo=TRUE, Multivariate_Plots}
+# fixed.acidity density quality_factor
+ggplot(data=winedata,aes(x=fixed.acidity,y=density,color=quality_factor))+
+  geom_point(alpha = 0.9, size = 2, position = 'jitter')
+
+# total.sulfur.dioxide free.sulfur.dioxide
+ggplot(data = subset(winedata,total.sulfur.dioxide<250),
+       aes(x=residual.sugar,y=total.sulfur.dioxide,color=quality_factor))+
+  geom_point()
+
+
+ggplot(data = subset(winedata,total.sulfur.dioxide<250),
+       aes(x=acidity,y=total.sulfur.dioxide,color=quality_factor))+
+  geom_point()
+```
+### 决策树
+```{r}
+library(rpart)
+library(rpart.plot)
+ct<-rpart.control(xval=10,minsplit=20,cp=0.008)
+cfit<-rpart(quality~volatile.acidity+citric.acid+
+              pH+sulphates+alcohol+
+              density,data=winedata,
+            method='class',
+            control=ct,
+            parms=list(split='gini'))
+print(cfit)
+
+rpart.plot(cfit,branch=1,
+           branch.type=2,
+           type=1,
+           extra = 102,
+           shadow.col = 'gray',
+           box.col='green',
+           border.col='blue',
+           split.col='red',
+           split.cex=1.2,
+           main='Decision Tree')
+```
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
+### total.sulfur.dioxide free.sulfur.dioxide之间相互增强；酸的含量越高，pH值越低，这两个变量之间呈负相关性
+
+### Were there any interesting or surprising interactions between features?
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the strengths and limitations of your model.
+### 我尝试使用决策树建模，但是结果只能区分出5，6,7三种酒，其他的档次的酒区分不明显
+
+------
+
+# Final Plots and Summary
+```{r}
+summary_line<-function(x,y,dataset){
+  ggplot(data=dataset,aes(x=x,y=y))+
+    geom_line(stat='summary',fun.y=mean)
+}
+```
+
+### Plot One
+```{r echo=TRUE, Plot_One}
+summary_line(winedata$quality,winedata$volatile.acidity,winedata)
+```
+
+### Description One
+### volatile.acidity的均值与quality变量之间负相关度较高
+
+### Plot Two
+```{r echo=TRUE, Plot_Two}
+summary_line(winedata$quality,winedata$citric.acid,winedata)
+#summary_line(winedata$quality,winedata$density,winedata)
+#summary_line(winedata$quality,winedata$pH,winedata)
+
+#summary_line(winedata$quality,winedata$alcohol,winedata)
+```
+
+### Description Two
+### citric.acid的均值与quality变量之间具有很高的正相关性
+
+### Plot Three
+```{r echo=TRUE, Plot_Three}
+summary_line(winedata$quality,winedata$sulphates,winedata)
+```
+
+### Description Three
+sulphates变量均值与quality变量之间具有很高的正相关性
+------
+
+# Reflection
+### 1.这些酒的品质是品酒师通过嗅觉和味觉给出的判断，带有一定的主观性，可能会给目标变量带来一定的干扰；
+### 2.酒的化学成分在一定程度上决定了酒的口感，所有这些化学成分的配比才是决定口感的更重要因素。
