@@ -1,6 +1,10 @@
 Wine Quality 
 ========================================================
 
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+```
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
 # Load all of the packages that you end up using
 # in your analysis in this code chunk.
@@ -21,68 +25,135 @@ winedata=read.csv('wineQualityReds.csv')
 # winedata=read.csv('wineQualityWhites.csv')
 ```
 
-```{r}
-singal_var_his<-function(x,binwidth){
-  qplot(x=x,binwidth=binwidth)
-}
-
-```
-
 # Univariate Plots Section
 ```{r echo=TRUE, Univariate_Plots}
+library(ggplot2)
 winedata$quality_factor=factor(winedata$quality)
 winedata$acidity=with(data=winedata,fixed.acidity+volatile.acidity+citric.acid)
-
-singal_var_his(winedata$fixed.acidity,0.2)
-
-#不易挥发性酸
-singal_var_his(winedata$fixed.acidity,0.2)
-#易挥发性酸
-singal_var_his(winedata$volatile.acidity,0.02)
-#柠檬酸
-singal_var_his(winedata$citric.acid,0.02)
-#剩余糖分
-singal_var_his(winedata$residual.sugar,0.2)
-#氯化物
-singal_var_his(winedata$chlorides,0.02)+
-  scale_x_log10()
-#单体硫
-singal_var_his(winedata$free.sulfur.dioxide,1)
-#总硫量
-singal_var_his(winedata$total.sulfur.dioxide,5)+
-  xlim(0,165)
-#table(winedata$total.sulfur.dioxide)
-#密度
-singal_var_his(winedata$density,0.0005)
-#pH值
-singal_var_his(winedata$pH,0.05)
-#硫酸盐
-singal_var_his(winedata$sulphates,0.02)+
-  xlim(0.3,1.5)
-#table(winedata$sulphates)
-#酒精度
-singal_var_his(winedata$alcohol,0.2)
-#table(winedata$alcohol)
-#酸总量
-singal_var_his(winedata$acidity,0.5)
 ```
+
+```{r}
+qplot(data=winedata,x=quality)
+```
+
+#### 从图中可以看出，品质为5和6的酒样本数量最多，占样本总数80%左右。
+
+```{r}
+#不易挥发性酸
+qplot(data=winedata,x=fixed.acidity,binwidth=0.4)+
+  facet_wrap(~quality)
+```
+
+#### 从5和6中看出非挥发性酸基本上呈正态分布，其他图中由于样本数太少，不足以看出分布情况。
+
+```{r}
+#易挥发性酸
+qplot(data=winedata,x=volatile.acidity,binwidth=0.04)+
+  facet_wrap(~quality)
+```
+
+#### 易挥发酸性酸与挥发性酸的分布情况相似。
+
+```{r}
+#柠檬酸
+qplot(data=winedata,x=citric.acid,binwidth=0.04)+
+  facet_wrap(~quality)
+```
+
+#### 柠檬酸
+
+```{r}
+#剩余糖分
+qplot(data=winedata,x=residual.sugar,binwidth=0.2)+
+  facet_wrap(~quality)
+```
+
+#### 剩余糖为对称分布。
+
+```{r}
+#氯化物
+qplot(data=winedata,x=chlorides,binwidth=0.02)+
+  scale_x_log10()+
+  facet_wrap(~quality)
+```
+
+#### 氯化物为对称分布。
+
+```{r}
+#单体硫
+qplot(data=winedata,x=free.sulfur.dioxide,binwidth=2)+
+  facet_wrap(~quality)
+```
+
+#### 单体硫为含量越低样本数量越多，在含量为20以后样本数量下降很快。
+
+```{r}
+#总硫量
+qplot(data=winedata,x=total.sulfur.dioxide,binwidth=5)+
+  xlim(0,165)+
+  facet_wrap(~quality)
+```
+
+#### 从5、6、7图可以看出总硫量分布为单调递减，而且在含量为50以后样本数量下降很快，与单体硫的分布相似，这两个变量应该具有正向相关性。
+
+```{r}
+#密度
+qplot(data=winedata,x=density,binwidth=0.0005)+
+  facet_wrap(~quality)
+```
+
+#### 密度
+
+```{r}
+#pH值
+qplot(data=winedata,x=pH,binwidth=0.05)+
+  facet_wrap(~quality)
+```
+
+#### pH值
+
+
+```{r}
+#硫酸盐
+qplot(data=winedata,x=sulphates,binwidth=0.02)+
+  xlim(0.3,1.5)+
+  facet_wrap(~quality)
+```
+
+#### 硫酸盐
+
+```{r}
+#酒精度
+qplot(data=winedata,x=alcohol,binwidth=0.2)+
+  facet_wrap(~quality)
+```
+
+#### 酒精度
+
+```{r}
+#酸总量
+qplot(data=winedata,x=acidity,binwidth=0.5)+
+  facet_wrap(~quality)
+```
+
+#### 酸总量
 
 # Univariate Analysis
 
 ### What is the structure of your dataset?
-### 数据集中包含了红酒的化学成分以及这些成分的具体含量，还包括了红酒品质的评价字段
+#### 数据集共有1599条样本数据，11个自变量和1个目标变量，自变量为包含了红酒的化学成分以及这些成分的具体含量，目标变量为品酒师对就的质量作出的评价。
 
 ### What is/are the main feature(s) of interest in your dataset?
-### 我感兴趣的变量有citric.acid(柠檬酸)、free.sulfur.dioxide(游离二氧化硫)、total.sulfur.dioxide(总硫量)、alcohol(酒精度),从这些变量的的直方图可以看出，这些这些变量的分布是分布是不对称的
+#### 我感兴趣的变量有citric.acid(柠檬酸)、free.sulfur.dioxide(游离二氧化硫)、total.sulfur.dioxide(总硫量)、alcohol(酒精度),从这些变量的的直方图可以看出，这些这些变量的分布是分布是不对称的
 
 ### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
-### 密度变量与就的品质也有一定关系
+#### 密度变量与酒的品质也有一定关系
 
 ### Did you create any new variables from existing variables in the dataset?
-### 1.quality变量经过factor函数衍生出quality_factor变量 2.把所有酸加和的acidity字段
+#### 1.quality变量经过factor函数衍生出quality_factor变量 2.把所有酸加和的acidity字段
 
 ### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
-### 没有
+#### 没有
 
 ```{r}
 quality_boxplot<-function(x,y,method='boxplot'){
@@ -93,40 +164,104 @@ quality_boxplot<-function(x,y,method='boxplot'){
 ```
 
 # Bivariate Plots Section
-###全量矩阵图
-```{r echo=TRUE, Bivariate_Plots}
+#### 全量矩阵图
+
+```{r fig.width = 15, fig.height = 15}
 p_<-GGally::print_if_interactive
 wine_plot<-wrap(ggpairs,shape=I('.'),outlier.shape=I('.'))
 wine_plot1<-wine_plot(winedata,mapping = NULL)
 p_(wine_plot1)
 ```
-###所有变量与quality_factor之间的boxplot
+
+#### 所有变量与quality_factor之间的boxplot
+
 ```{r}
-quality_boxplot(winedata$quality_factor,winedata$fixed.acidity)
-quality_boxplot(winedata$quality_factor,winedata$volatile.acidity)
-quality_boxplot(winedata$quality_factor,winedata$citric.acid)
-quality_boxplot(winedata$quality_factor,winedata$residual.sugar)
-quality_boxplot(winedata$quality_factor,winedata$chlorides)
-quality_boxplot(winedata$quality_factor,winedata$free.sulfur.dioxide)
-quality_boxplot(winedata$quality_factor,winedata$total.sulfur.dioxide)
-quality_boxplot(winedata$quality_factor,winedata$density)
-quality_boxplot(winedata$quality_factor,winedata$pH)
-quality_boxplot(winedata$quality_factor,winedata$sulphates)
-quality_boxplot(winedata$quality_factor,winedata$alcohol)
+ggplot(aes(x=quality_factor,y=fixed.acidity),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('非挥发性酸 vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=volatile.acidity),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('挥发性酸 vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=citric.acid),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('柠檬酸 vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=residual.sugar),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('剩余糖 vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=chlorides),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('氯化物 vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=free.sulfur.dioxide),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('游离二氧化硫 vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=total.sulfur.dioxide),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('二氧化硫总量 vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=density),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('密度 vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=pH),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('pH vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=sulphates),data=winedata)+
+  geom_jitter(alpha=0.3)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('硫酸铵 vs. 品质')
+```
+
+```{r}
+ggplot(aes(x=quality_factor,y=alcohol),data=winedata)+
+  geom_jitter(alpha=0.5)+
+  geom_boxplot(alpha=0.5)+
+  ggtitle('酒精度 vs. 品质')
 ```
 
 # Bivariate Analysis
 
 ### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
-### 通过观察每个变量与品质变量之间的boxplot关系发现，酒的品质越高，volatile.acidity（挥发性酸）均值越低，citric acid(柠檬酸)均值越来越高，density(密度)均值也是基本上呈下降趋势，pH值均值也呈略微下降趋势，sulphates(硫酸盐)均值呈上升趋势，
+#### 通过观察每个变量与品质变量之间的boxplot关系发现，酒的品质越高，volatile.acidity（挥发性酸）均值越低，citric acid(柠檬酸)均值越来越高，density(密度)均值也是基本上呈下降趋势，pH值均值也呈略微下降趋势，sulphates(硫酸盐)均值呈上升趋势，
 
 ### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
-### 酸的含量越高，pH值越低,这两个变量为耦合变量;变量total.sulfur.dioxide和free.sulfur.dioxide之间呈正相关性
+#### 酸的含量越高，pH值越低,这两个变量为耦合变量;变量total.sulfur.dioxide和free.sulfur.dioxide之间呈正相关性
 
 ### What was the strongest relationship you found?
-### 酒的品质与酒精度的相关系数最大;total.sulfur.dioxide free.sulfur.dioxide之间呈正相关性
-
-
+#### 酒的品质与酒精度的相关系数最大;total.sulfur.dioxide free.sulfur.dioxide之间呈正相关性
 
 # Multivariate Plots Section
 
@@ -145,6 +280,7 @@ ggplot(data = subset(winedata,total.sulfur.dioxide<250),
        aes(x=acidity,y=total.sulfur.dioxide,color=quality_factor))+
   geom_point()
 ```
+
 ### 决策树
 ```{r}
 library(rpart)
@@ -169,15 +305,16 @@ rpart.plot(cfit,branch=1,
            split.cex=1.2,
            main='Decision Tree')
 ```
+
 # Multivariate Analysis
 
 ### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
-### total.sulfur.dioxide free.sulfur.dioxide之间相互增强；酸的含量越高，pH值越低，这两个变量之间呈负相关性
+#### total.sulfur.dioxide free.sulfur.dioxide之间相互增强；酸的含量越高，pH值越低，这两个变量之间呈负相关性
 
 ### Were there any interesting or surprising interactions between features?
 
 ### OPTIONAL: Did you create any models with your dataset? Discuss the strengths and limitations of your model.
-### 我尝试使用决策树建模，但是结果只能区分出5，6,7三种酒，其他的档次的酒区分不明显
+#### 尝试使用决策树建模，但是结果只能区分出5，6，7三种酒，其他的品质的酒区分不明显
 
 ------
 
@@ -195,19 +332,15 @@ summary_line(winedata$quality,winedata$volatile.acidity,winedata)
 ```
 
 ### Description One
-### volatile.acidity的均值与quality变量之间负相关度较高
+#### volatile.acidity的均值与quality变量之间负相关度较高
 
 ### Plot Two
 ```{r echo=TRUE, Plot_Two}
 summary_line(winedata$quality,winedata$citric.acid,winedata)
-#summary_line(winedata$quality,winedata$density,winedata)
-#summary_line(winedata$quality,winedata$pH,winedata)
-
-#summary_line(winedata$quality,winedata$alcohol,winedata)
 ```
 
 ### Description Two
-### citric.acid的均值与quality变量之间具有很高的正相关性
+#### citric.acid的均值与quality变量之间具有很高的正相关性
 
 ### Plot Three
 ```{r echo=TRUE, Plot_Three}
@@ -215,9 +348,11 @@ summary_line(winedata$quality,winedata$sulphates,winedata)
 ```
 
 ### Description Three
-sulphates变量均值与quality变量之间具有很高的正相关性
+#### sulphates变量均值与quality变量之间具有很高的正相关性
 ------
 
 # Reflection
-### 1.这些酒的品质是品酒师通过嗅觉和味觉给出的判断，带有一定的主观性，可能会给目标变量带来一定的干扰；
-### 2.酒的化学成分在一定程度上决定了酒的口感，所有这些化学成分的配比才是决定口感的更重要因素。
+#### 1.这些酒的品质是品酒师通过嗅觉和味觉给出的判断，带有一定的主观性，可能会给目标变量带来一定的干扰；
+#### 2.酒的化学成分在一定程度上决定了酒的口感，所有这些化学成分的配比才是决定口感的更重要因素；
+#### 3.此数据集中样本分布不均匀，品质为5和6的样本数量占到样本总和的80%，如果减少这两种样本，样本总数又太少。
+
