@@ -34,101 +34,102 @@ winedata$acidity=with(data=winedata,fixed.acidity+volatile.acidity+citric.acid)
 
 ### 1. 从图中可以看出，品质为5和6的酒样本数量最多，占样本总数80%左右。
 ```{r}
-qplot(data=winedata,x=quality)
+qplot(data=winedata,x=quality)+
+  ggtitle('不同品质样本分布图')
 ```
 
-### 2. 从5和6中看出非挥发性酸基本上呈正态分布，其他图中由于样本数太少，不足以看出分布情况。
+### 2. 非挥发性酸
 ```{r}
 # 不易挥发性酸
-qplot(data=winedata,x=fixed.acidity,binwidth=0.4)+
-  facet_wrap(~quality)
+qplot(data=winedata,x=fixed.acidity,binwidth=0.3)+
+  xlab('fixed acidity(g / dm^3)')
 ```
 
-### 3. 易挥发酸性酸与挥发性酸的分布情况相似。
+### 3. 易挥发酸性酸的分布出现双峰形态，分别在0.4和0.65处分布最多。
 ```{r}
 # 易挥发性酸
-qplot(data=winedata,x=volatile.acidity,binwidth=0.04)+
-  facet_wrap(~quality)
+qplot(data=winedata,x=volatile.acidity,binwidth=0.03)+
+  xlab('volatile acidity(g / dm^3)')
 ```
 
-### 4. 柠檬酸
+### 4. 柠檬酸的分布比较杂乱，出现了几个离群点。
 ```{r}
 # 柠檬酸
-qplot(data=winedata,x=citric.acid,binwidth=0.04)+
-  facet_wrap(~quality)
+qplot(data=winedata,x=citric.acid,binwidth=0.02)+
+  xlab('citric acid (g / dm^3)')
 ```
 
-### 5. 剩余糖为对称分布。
+### 5. 剩余糖几乎为对称分布，少数样本分布比较杂乱。
 ```{r}
 # 剩余糖分
 qplot(data=winedata,x=residual.sugar,binwidth=0.2)+
-  facet_wrap(~quality)
+  xlab('residual sugar (g / dm^3)')
 ```
 
-### 6. 氯化物为对称分布。
+### 6. 氯化物为对称与剩余糖分布类似。
 ```{r}
 # 氯化物
-qplot(data=winedata,x=chlorides,binwidth=0.02)+
-  scale_x_log10()+
-  facet_wrap(~quality)
+qplot(data=winedata,x=chlorides,binwidth=0.01)+
+  xlab('chlorides (g / dm^3)')
 ```
 
 
-### 7. 单体硫为含量越低样本数量越多，在含量为20以后样本数量下降很快。
+### 7. 单体硫为单调递减分布。
 ```{r}
 # 单体硫
 qplot(data=winedata,x=free.sulfur.dioxide,binwidth=2)+
-  facet_wrap(~quality)
+  xlab('free sulfur dioxide (mg / dm^3)')
 ```
 
-### 8. 从5、6、7图可以看出总硫量分布为单调递减，而且在含量为50以后样本数量下降很快，与单体硫的分布相似，这两个变量应该具有正向相关性。
+### 8. 总硫量分布为单调递减的长尾分布,对x轴取对数以后为对称分布，有少量利群点。
 ```{r}
 # 总硫量
-qplot(data=winedata,x=total.sulfur.dioxide,binwidth=5)+
+qplot(data=winedata,x=total.sulfur.dioxide,binwidth=0.05)+
   xlim(0,165)+
-  facet_wrap(~quality)
+  scale_x_log10()+
+  xlab('total sulfur dioxide (mg / dm^3)')
 ```
 
-### 9. 密度
+### 9. 密度为对称分布
 ```{r}
 # 密度
 qplot(data=winedata,x=density,binwidth=0.0005)+
-  facet_wrap(~quality)
+  xlab('density (g / cm^3)')
 ```
 
-### 10. pH值
+### 10. pH值几乎为对称分布
 ```{r}
 # pH值
 qplot(data=winedata,x=pH,binwidth=0.05)+
-  facet_wrap(~quality)
+  xlab('pH')
 ```
 
-### 11. 硫酸盐
+### 11. 硫酸盐对x轴取对数以后几乎为对称分布。
 ```{r}
 # 硫酸盐
 qplot(data=winedata,x=sulphates,binwidth=0.02)+
-  xlim(0.3,1.5)+
-  facet_wrap(~quality)
+  scale_x_log10()+
+  xlab('sulphates (g / dm3)')
 ```
 
-### 12. 酒精度
+### 12. 酒精度为单调递减分布
 ```{r}
 # 酒精度
 qplot(data=winedata,x=alcohol,binwidth=0.2)+
-  facet_wrap(~quality)
+  xlab('alcohol (% by volume)')
 ```
 
 ### 13. 酸总量
 ```{r}
 # 酸总量
 qplot(data=winedata,x=acidity,binwidth=0.5)+
-  facet_wrap(~quality)
+  xlab('acidity(g / dm^3)')
 ```
 
 # 第二部分 总体分析
 
 ### 1. What is the structure of your dataset?
-#### 数据集共有1599条样本数据，11个自变量和1个目标变量，自变量为包含了红酒的化学成分以及这些成分的具体含量，目标变量为品酒师对就的质量作出的评价。
+#### 数据集共有1599条样本数据，11个自变量和1个目标变量，自变量为红酒中的化学成分及其具体含量，目标变量为品酒师对酒的质量作出的评价。
 
 ### 2. What is/are the main feature(s) of interest in your dataset?
 #### 我感兴趣的变量有citric.acid(柠檬酸)、free.sulfur.dioxide(游离二氧化硫)、total.sulfur.dioxide(总硫量)、alcohol(酒精度),从这些变量的的直方图可以看出，这些这些变量的分布是分布是不对称的，包含的信息较多。
@@ -162,8 +163,12 @@ p_(wine_plot1)
 
 ### 2. 所有变量与quality_factor之间的boxplot
 
-#### 非挥发性酸与品质之间没有很明显的关联性，3~7可以看出在均值在上升，8的均值与7相比下降，有可能是由于8的样品数量太少导致；样本分布比较分散。
+#### 非挥发性酸在5、6两种样本中低浓度占比较大，高浓度样本较少。非挥发性酸与品质之间没有很明显的关联性，3~7可以看出在均值在上升，8的均值与7相比下降，有可能是由于8的样品数量太少导致；样本分布比较分散。
 ```{r}
+qplot(data=winedata,x=fixed.acidity,binwidth=0.4)+
+  facet_wrap(~quality)+
+  xlab('fixed acidity (tartaric acid - g / dm^3)')
+
 ggplot(aes(x=quality_factor,y=fixed.acidity),data=subset(winedata,total.sulfur.dioxide<200))+
   geom_jitter(alpha=0.3)+
   geom_boxplot(alpha=0.5)+
@@ -171,8 +176,12 @@ ggplot(aes(x=quality_factor,y=fixed.acidity),data=subset(winedata,total.sulfur.d
   theme(text=element_text(family="STKaiti",size=14))
 ```
 
-#### 3. 从图中可以看出挥发性酸与品质之间有负相关性，挥发性酸的均值随着品质提升而下降；样本分布比较集中。
+#### 3. 挥发性酸在5、6图中出现双峰分布。挥发性酸与品质之间有负相关性，挥发性酸的均值随着品质提升而下降；样本分布比较集中。
 ```{r}
+qplot(data=winedata,x=volatile.acidity,binwidth=0.04)+
+  facet_wrap(~quality)+
+  xlab('volatile acidity (acetic acid - g / dm^3)')
+
 ggplot(aes(x=quality_factor,y=volatile.acidity),data=subset(winedata,total.sulfur.dioxide<200))+
   geom_jitter(alpha=0.3)+
   geom_boxplot(alpha=0.5)+
@@ -180,8 +189,12 @@ ggplot(aes(x=quality_factor,y=volatile.acidity),data=subset(winedata,total.sulfu
   theme(text=element_text(family="STKaiti",size=14))
 ```
 
-#### 4. 柠檬酸的均值虽然随着品质升高而上升，但是样本分布很分散，5~8的样本极大值相差不大。
+#### 4. 柠檬酸在5、6中为波动性分布。柠檬酸的均值虽然随着品质升高而上升，但是样本分布很分散，5~8的样本极大值相差不大。
 ```{r}
+qplot(data=winedata,x=citric.acid,binwidth=0.04)+
+  facet_wrap(~quality)+
+  xlab('citric acid (g / dm^3)')
+
 ggplot(aes(x=quality_factor,y=citric.acid),data=subset(winedata,total.sulfur.dioxide<200))+
   geom_jitter(alpha=0.3)+
   geom_boxplot(alpha=0.5)+
@@ -189,8 +202,12 @@ ggplot(aes(x=quality_factor,y=citric.acid),data=subset(winedata,total.sulfur.dio
   theme(text=element_text(family="STKaiti",size=14))
 ```
 
-#### 5. 剩余糖量与品质之间的相关度低，大部分样本的糖剩余量都在2左右；样本分布比较分散。
+#### 5. 大部分样本分布在低浓度剩余糖区域，只有少量样本的剩余糖含量较高；剩余糖量与品质之间的相关度低，大部分样本的糖剩余量都在2左右；样本分布比较分散。
 ```{r}
+qplot(data=winedata,x=residual.sugar,binwidth=0.2)+
+  facet_wrap(~quality)+
+  xlab('residual sugar (g / dm^3)')
+
 ggplot(aes(x=quality_factor,y=residual.sugar),data=subset(winedata,total.sulfur.dioxide<200))+
     geom_jitter(alpha=0.3)+
     geom_boxplot(alpha=0.5)+
@@ -198,8 +215,13 @@ ggplot(aes(x=quality_factor,y=residual.sugar),data=subset(winedata,total.sulfur.
     theme(text=element_text(family="STKaiti",size=14))
 ```
 
-#### 6. 氯化物样本分布比较集中，均值和分布情况与品质之间相关度低。
+#### 6. 在x轴取对数以后，氯化物的分布为对称分布；氯化物样本分布比较集中，均值和分布情况与品质之间相关度低。
 ```{r}
+qplot(data=winedata,x=chlorides,binwidth=0.02)+
+  scale_x_log10()+
+  facet_wrap(~quality)+
+  xlab('chlorides (g / dm^3)')
+
 ggplot(aes(x=quality_factor,y=chlorides),data=subset(winedata,total.sulfur.dioxide<200))+
     geom_jitter(alpha=0.3)+
     geom_boxplot(alpha=0.5)+
@@ -207,8 +229,12 @@ ggplot(aes(x=quality_factor,y=chlorides),data=subset(winedata,total.sulfur.dioxi
     theme(text=element_text(family="STKaiti",size=14))
 ```
 
-#### 7. 游离二氧化硫与品质之间呈先升高后降低的趋势。
+#### 7. 游离二氧化硫为单调递减分布；游离二氧化硫与品质之间呈先升高后降低的趋势。
 ```{r}
+qplot(data=winedata,x=free.sulfur.dioxide,binwidth=2)+
+  facet_wrap(~quality)+
+  xlab('free sulfur dioxide (mg / dm^3)')
+
 ggplot(aes(x=quality_factor,y=free.sulfur.dioxide),data=subset(winedata,total.sulfur.dioxide<200))+
     geom_jitter(alpha=0.3)+
     geom_boxplot(alpha=0.5)+
@@ -217,8 +243,13 @@ ggplot(aes(x=quality_factor,y=free.sulfur.dioxide),data=subset(winedata,total.su
     theme(text=element_text(family="STKaiti",size=14))
 ```
 
-#### 8. 二氧化硫含量与品质之间呈先上升后下降趋势。
+#### 8. 二氧化硫分布单调递减；二氧化硫含量与品质之间呈先上升后下降趋势。
 ```{r}
+qplot(data=winedata,x=total.sulfur.dioxide,binwidth=5)+
+  xlim(0,165)+
+  facet_wrap(~quality)+
+  xlab('total sulfur dioxide (mg / dm^3)')
+
 ggplot(aes(x=quality_factor,y=total.sulfur.dioxide),data=subset(winedata,total.sulfur.dioxide<200))+
   geom_jitter(alpha=0.3)+
   geom_boxplot(alpha=0.5)+
@@ -227,8 +258,12 @@ ggplot(aes(x=quality_factor,y=total.sulfur.dioxide),data=subset(winedata,total.s
   theme(text=element_text(family="STKaiti",size=14))
 ```
 
-#### 9. 密度与品质之间呈下降趋势，品质越高密度越低。
+#### 9. 密度为对称分布；密度与品质之间呈下降趋势，品质越高密度越低。
 ```{r}
+qplot(data=winedata,x=density,binwidth=0.0005)+
+  facet_wrap(~quality)+
+  xlab('density (g / cm^3)')
+
 ggplot(aes(x=quality_factor,y=density*density),data=subset(winedata,total.sulfur.dioxide<200))+
   geom_jitter(alpha=0.3)+
   geom_boxplot(alpha=0.5)+
@@ -236,8 +271,12 @@ ggplot(aes(x=quality_factor,y=density*density),data=subset(winedata,total.sulfur
   theme(text=element_text(family="STKaiti",size=14))
 ```
 
-#### 10. pH与品质呈负相关性，品质越高pH值越低。
+#### 10. pH为对称分布；pH与品质呈负相关性，品质越高pH值越低。
 ```{r}
+qplot(data=winedata,x=pH,binwidth=0.05)+
+  facet_wrap(~quality)+
+  xlab('pH')
+
 ggplot(aes(x=quality_factor,y=pH*pH),data=subset(winedata,total.sulfur.dioxide<200))+
   geom_jitter(alpha=0.3)+
   geom_boxplot(alpha=0.5)+
@@ -245,8 +284,13 @@ ggplot(aes(x=quality_factor,y=pH*pH),data=subset(winedata,total.sulfur.dioxide<2
   theme(text=element_text(family="STKaiti",size=14))
 ```
 
-#### 11. 硫酸盐含量与品质呈正相关性，品质越高硫酸盐含量越高。
+#### 11. 样本大部分分布在硫酸盐低浓度区域；硫酸盐含量与品质呈正相关性，品质越高硫酸盐含量越高。
 ```{r}
+qplot(data=winedata,x=sulphates,binwidth=0.02)+
+  xlim(0.3,1.5)+
+  facet_wrap(~quality)+
+  xlab('sulphates (g / dm3)')
+
 ggplot(aes(x=quality_factor,y=sulphates),data=subset(winedata,total.sulfur.dioxide<200))+
   geom_jitter(alpha=0.3)+
   geom_boxplot(alpha=0.5)+
@@ -256,6 +300,10 @@ ggplot(aes(x=quality_factor,y=sulphates),data=subset(winedata,total.sulfur.dioxi
 
 #### 12. 酒精度与品质之间基本上呈正相关性，但品质为5的均值低于4和6，其他样本均值呈上升趋势。
 ```{r}
+qplot(data=winedata,x=alcohol,binwidth=0.2)+
+  facet_wrap(~quality)+
+  xlab('alcohol (% by volume)')
+
 ggplot(aes(x=quality_factor,y=alcohol),data=subset(winedata,total.sulfur.dioxide<200))+
   geom_jitter(alpha=0.5)+
   geom_boxplot(alpha=0.5)+
@@ -280,7 +328,8 @@ ggplot(aes(x=quality_factor,y=alcohol),data=subset(winedata,total.sulfur.dioxide
 ggplot(data=subset(winedata,total.sulfur.dioxide<200),
        aes(x=fixed.acidity,y=density*density,color=quality_factor))+
     geom_point(alpha = 0.9, size = 2, position = 'jitter')+
-    geom_smooth(method = 'lm')+
+    geom_smooth(method = 'lm',se=FALSE,size=1)+
+  scale_color_brewer(palette = 'Greens')
     ggtitle('fixed.acidity vs. density vs. quality')
 ```
 
@@ -290,7 +339,8 @@ ggplot(data=subset(winedata,total.sulfur.dioxide<200),
 ggplot(data = subset(winedata,total.sulfur.dioxide<200),
        aes(x=alcohol,y=density,color=quality_factor))+
     geom_point()+
-    geom_smooth(method = 'lm')+
+  scale_color_brewer(palette = 'Blues')+
+    geom_smooth(method = 'lm',se=FALSE,size=1)+
     ggtitle('density vs. alcohol vs. quality')
 ```
 
@@ -342,7 +392,8 @@ summary_line<-function(x,y,dataset){
 
 ### 图一
 ```{r echo=TRUE, Plot_One}
-qplot(data=winedata,x=quality)
+qplot(data=winedata,x=quality)+
+  ggtitle('不同品质样本分布图')
 ```
 
 ### 描述一
@@ -362,10 +413,12 @@ ggplot(aes(x=quality_factor,y=citric.acid),data=subset(winedata,total.sulfur.dio
 
 ### 图三
 ```{r echo=TRUE, Plot_Three}
+# fixed.acidity vs. density^2 vs. quality
 ggplot(data=subset(winedata,total.sulfur.dioxide<200),
        aes(x=fixed.acidity,y=density*density,color=quality_factor))+
     geom_point(alpha = 0.9, size = 2, position = 'jitter')+
-    geom_smooth(method = 'lm')+
+    geom_smooth(method = 'lm',se=FALSE,size=1)+
+  scale_color_brewer(palette = 'Greens')
     ggtitle('fixed.acidity vs. density vs. quality')
 ```
 
