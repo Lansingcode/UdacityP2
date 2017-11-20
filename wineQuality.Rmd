@@ -4,6 +4,8 @@
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 ```
+# 概述
+#### 红酒中含有很多种化学元素，这些化学元素的配比决定了红酒的气味和口感，但是哪些元素对红酒的最终品质影响最大呢？我们将通过探索红酒数据尝试发现影响红酒品质的因素。
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
 # Load all of the packages that you end up using
@@ -19,13 +21,13 @@ library(scales)
 #library(memisc)
 ```
 
+# 第一部分 数据总览
 ```{r echo=TRUE, Load_the_Data}
 # Load the Data
 winedata=read.csv('wineQualityReds.csv')
 # winedata=read.csv('wineQualityWhites.csv')
 ```
 
-# 第一部分 数据总览
 ```{r echo=TRUE, Univariate_Plots}
 library(ggplot2)
 winedata$quality_factor=factor(winedata$quality)
@@ -42,35 +44,40 @@ qplot(data=winedata,x=quality)+
 ```{r}
 # 不易挥发性酸
 qplot(data=winedata,x=fixed.acidity,binwidth=0.3)+
-  xlab('fixed acidity(g / dm^3)')
+  xlab('fixed acidity(g / dm^3)')+
+  ggtitle('非挥发酸直方图')
 ```
 
 ### 3. 易挥发酸性酸的分布出现双峰形态，分别在0.4和0.65处分布最多。
 ```{r}
 # 易挥发性酸
 qplot(data=winedata,x=volatile.acidity,binwidth=0.03)+
-  xlab('volatile acidity(g / dm^3)')
+  xlab('volatile acidity(g / dm^3)')+
+  ggtitle('挥发酸直方图')
 ```
 
 ### 4. 柠檬酸的分布比较杂乱，出现了几个离群点。
 ```{r}
 # 柠檬酸
 qplot(data=winedata,x=citric.acid,binwidth=0.02)+
-  xlab('citric acid (g / dm^3)')
+  xlab('citric acid (g / dm^3)')+
+  ggtitle('柠檬酸直方图')
 ```
 
 ### 5. 剩余糖几乎为对称分布，少数样本分布比较杂乱。
 ```{r}
 # 剩余糖分
 qplot(data=winedata,x=residual.sugar,binwidth=0.2)+
-  xlab('residual sugar (g / dm^3)')
+  xlab('residual sugar (g / dm^3)')+
+  ggtitle('糖含量直方图')
 ```
 
 ### 6. 氯化物为对称与剩余糖分布类似。
 ```{r}
 # 氯化物
 qplot(data=winedata,x=chlorides,binwidth=0.01)+
-  xlab('chlorides (g / dm^3)')
+  xlab('chlorides (g / dm^3)')+
+  ggtitle('氯化物直方图')
 ```
 
 
@@ -78,7 +85,8 @@ qplot(data=winedata,x=chlorides,binwidth=0.01)+
 ```{r}
 # 单体硫
 qplot(data=winedata,x=free.sulfur.dioxide,binwidth=2)+
-  xlab('free sulfur dioxide (mg / dm^3)')
+  xlab('free sulfur dioxide (mg / dm^3)')+
+  ggtitle('单体硫直方图')
 ```
 
 ### 8. 总硫量分布为单调递减的长尾分布,对x轴取对数以后为对称分布，有少量利群点。
@@ -87,21 +95,24 @@ qplot(data=winedata,x=free.sulfur.dioxide,binwidth=2)+
 qplot(data=winedata,x=total.sulfur.dioxide,binwidth=0.05)+
   xlim(0,165)+
   scale_x_log10()+
-  xlab('total sulfur dioxide (mg / dm^3)')
+  xlab('total sulfur dioxide (mg / dm^3)')+
+  ggtitle('总硫量直方图')
 ```
 
 ### 9. 密度为对称分布
 ```{r}
 # 密度
 qplot(data=winedata,x=density,binwidth=0.0005)+
-  xlab('density (g / cm^3)')
+  xlab('density (g / cm^3)')+
+  ggtitle('密度直方图')
 ```
 
 ### 10. pH值几乎为对称分布
 ```{r}
 # pH值
 qplot(data=winedata,x=pH,binwidth=0.05)+
-  xlab('pH')
+  xlab('pH')+
+  ggtitle('pH直方图')
 ```
 
 ### 11. 硫酸盐对x轴取对数以后几乎为对称分布。
@@ -109,21 +120,24 @@ qplot(data=winedata,x=pH,binwidth=0.05)+
 # 硫酸盐
 qplot(data=winedata,x=sulphates,binwidth=0.02)+
   scale_x_log10()+
-  xlab('sulphates (g / dm3)')
+  xlab('sulphates (g / dm3)')+
+  ggtitle('硫酸盐直方图')
 ```
 
 ### 12. 酒精度为单调递减分布
 ```{r}
 # 酒精度
 qplot(data=winedata,x=alcohol,binwidth=0.2)+
-  xlab('alcohol (% by volume)')
+  xlab('alcohol (% by volume)')+
+  ggtitle('酒精度直方图')
 ```
 
 ### 13. 酸总量
 ```{r}
 # 酸总量
 qplot(data=winedata,x=acidity,binwidth=0.5)+
-  xlab('acidity(g / dm^3)')
+  xlab('acidity(g / dm^3)')+
+  ggtitle('酸总量直方图')
 ```
 
 # 第二部分 总体分析
@@ -428,6 +442,12 @@ ggplot(data=subset(winedata,total.sulfur.dioxide<200),
 ------
 
 # 第八部分 反思
-#### 1.这些酒的品质是品酒师通过嗅觉和味觉给出的判断，带有一定的主观性，可能会给目标变量带来一定的干扰；
-#### 3.此数据集中样本分布不均匀，品质为5和6的样本数量占到样本总和的80%，如果减少这两种样本，样本总数又太少；
-#### 2.酒的化学成分在一定程度上决定了酒的口感，所有这些化学成分的配比才是决定口感的更重要因素。
+## 遇到的问题
+#### 1.数据量小且数据分布不均匀，品质为5和6的样本占比超过80%，占比过大；
+#### 2.特征变量与特征变量之间，特征变量与目标变量之间的相关性很低，只有大概的趋势，很难通过取对数或者其他变换方式得到很明显的相关趋势。
+#### 3.这些酒的品质是品酒师通过嗅觉和味觉给出的判断，带有一定的主观性，可能会给目标变量带来一定的干扰；
+#### 4.酒的化学成分在一定程度上决定了酒的口感，但是所有这些化学成分的配比才是决定口感的更重要因素。
+
+## 以后改进的方向
+#### 1.增大样本总量，通过分层抽样方式使数据均匀分布。
+#### 2.使用更多变量，也许会找出相关性更高的变量。
